@@ -1,0 +1,4 @@
+environs==9.5.0
+google-cloud-dialogflow==2.13.0
+python-telegram-bot==13.11
+requests==2.27.1
