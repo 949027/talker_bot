@@ -11,8 +11,10 @@ def main():
     env = Env()
     env.read_env()
 
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                        level=logging.INFO)
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO
+    )
 
     vk_session = vk.VkApi(token=env('VK_TOKEN'))
     vk_api = vk_session.get_api()
@@ -24,12 +26,13 @@ def main():
                 event.user_id,
                 [event.text]
             )
-            vk_api.messages.send(
-                user_id=event.user_id,
-                message=response,
-                random_id=random.randint(1, 1000)
-            )
-            logging.info('Message send')
+            if not response.query_result.intent.is_fallback:
+                vk_api.messages.send(
+                    user_id=event.user_id,
+                    message=response.query_result.fulfillment_text,
+                    random_id=random.randint(1, 1000)
+                )
+                logging.info('Message send')
 
 
 if __name__ == "__main__":
