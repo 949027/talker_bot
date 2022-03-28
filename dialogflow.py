@@ -3,6 +3,22 @@ from environs import Env
 from google.cloud import dialogflow
 
 
+def detect_intent_texts(project_id, session_id, texts, language_code='ru-RU'):
+    session_client = dialogflow.SessionsClient()
+
+    session = session_client.session_path(project_id, session_id)
+
+    for text in texts:
+        text_input = dialogflow.TextInput(text=text, language_code=language_code)
+
+        query_input = dialogflow.QueryInput(text=text_input)
+
+        response = session_client.detect_intent(
+            request={"session": session, "query_input": query_input}
+        )
+    return response.query_result.fulfillment_text
+
+
 def create_intent(project_id, display_name, training_phrases_parts, message_texts):
     intents_client = dialogflow.IntentsClient()
 
@@ -27,13 +43,24 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 
     print("Intent created: {}".format(response))
 
-env = Env()
-env.read_env()
-with open('questions.json', 'r') as file:
-    intents = json.load(file)
-project_id = 'high-extension-344009'
-chat_id = 200466788
-for display_name, intent in intents.items():
-    questions = intent['questions']
-    answers = [intent['answer']]
-    create_intent(project_id, display_name, questions, answers)
+
+def main():
+    env = Env()
+    env.read_env()
+
+    with open('questions.json', 'r') as file:
+        intents = json.load(file)
+
+    for display_name, intent in intents.items():
+        questions = intent['questions']
+        answers = [intent['answer']]
+        create_intent(
+            env('DIALOGFLOW_PROJECT_ID'),
+            display_name,
+            questions,
+            answers
+        )
+
+
+if __name__ == "__main__":
+    main()
