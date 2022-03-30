@@ -1,26 +1,32 @@
 import argparse
+import logging
 import json
 from environs import Env
 from google.cloud import dialogflow
 
+logger = logging.getLogger('bot_logger')
+
 
 def detect_intent_texts(project_id, session_id, texts, language_code='ru-RU'):
-    session_client = dialogflow.SessionsClient()
+    try:
+        session_client = dialogflow.SessionsClient()
 
-    session = session_client.session_path(project_id, session_id)
+        session = session_client.session_path(project_id, session_id)
 
-    for text in texts:
-        text_input = dialogflow.TextInput(
-            text=text,
-            language_code=language_code,
-        )
+        for text in texts:
+            text_input = dialogflow.TextInput(
+                text=text,
+                language_code=language_code,
+            )
 
-        query_input = dialogflow.QueryInput(text=text_input)
+            query_input = dialogflow.QueryInput(text=text_input)
 
-        response = session_client.detect_intent(
-            request={"session": session, "query_input": query_input}
-        )
-    return response
+            response = session_client.detect_intent(
+                request={"session": session, "query_input": query_input}
+            )
+        return response
+    except Exception as err:
+        logger.exception(err)
 
 
 def create_intent(project_id, display_name, training_phrases_parts, msg_texts):
