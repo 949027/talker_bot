@@ -42,9 +42,10 @@ def main():
     for event in longpoll.listen():
         try:
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                session_id = f'vk-{event.text}'
                 response = detect_intent_texts(
                     env('DIALOGFLOW_PROJECT_ID'),
-                    event.user_id,
+                    session_id,
                     [event.text]
                 )
                 if not response.query_result.intent.is_fallback:
