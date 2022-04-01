@@ -34,7 +34,7 @@ def start(update: Update, context: CallbackContext):
     )
 
 
-def to_answer(update: Update, context: CallbackContext):
+def reply_to_message(update: Update, context: CallbackContext):
     try:
         project_id = env('DIALOGFLOW_PROJECT_ID')
         chat_id = update.effective_chat.id
@@ -66,7 +66,7 @@ def main():
 
     answer_handler = MessageHandler(
         Filters.text & (~Filters.command),
-        to_answer,
+        reply_to_message,
     )
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
