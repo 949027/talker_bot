@@ -8,23 +8,12 @@ from telegram.ext import MessageHandler, Filters
 from environs import Env
 
 from dialogflow import detect_intent_texts
+from telegram_handlers import TelegramLogsHandler
 
 env = Env()
 env.read_env()
 
 logger = logging.getLogger('bot_logger')
-
-
-class TelegramLogsHandler(logging.Handler):
-
-    def __init__(self, tg_bot, chat_id):
-        super().__init__()
-        self.chat_id = chat_id
-        self.tg_bot = tg_bot
-
-    def emit(self, record):
-        log_entry = self.format(record)
-        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
 def start(update: Update, context: CallbackContext):
