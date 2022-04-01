@@ -35,18 +35,20 @@ def start(update: Update, context: CallbackContext):
 
 
 def reply_to_message(update: Update, context: CallbackContext):
-    try:
-        project_id = env('DIALOGFLOW_PROJECT_ID')
-        chat_id = update.effective_chat.id
-        user_text = update.message.text
-        response = detect_intent_texts(project_id, chat_id, [user_text])
-        context.bot.send_message(
-            chat_id=chat_id,
-            text=response.query_result.fulfillment_text,
-        )
-        logger.info('Message send')
-    except Exception as err:
-        logger.exception(err)
+    project_id = env('DIALOGFLOW_PROJECT_ID')
+    chat_id = update.effective_chat.id
+    user_text = update.message.text
+    response = detect_intent_texts(project_id, chat_id, [user_text])
+    context.bot.send_message(
+        chat_id=chat_id,
+        text=response.query_result.fulfillment_text,
+    )
+    logger.info('Message send')
+
+
+def catch_error(update: Update, context: CallbackContext):
+    username = update.message.chat.username
+    logger.exception(f'Ошибка от пользователя {username}')
 
 
 def main():
@@ -71,6 +73,7 @@ def main():
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(answer_handler)
+    dispatcher.add_error_handler(catch_error)
 
     updater.start_polling()
 
